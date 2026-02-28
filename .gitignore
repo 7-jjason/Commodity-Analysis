@@ -1,0 +1,13 @@
+data/
+
+.DS_Store
+
+*.rds
+*.csv
+*.xlsx
+
+/files/stocktrak*
+
+eia_api_key.R
+
+lseg_commodity_futures_historical.csv

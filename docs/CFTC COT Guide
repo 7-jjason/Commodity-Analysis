@@ -1,0 +1,88 @@
+The Disaggregated COT report increases transparency from the legacy COT reports by separating
+traders into the following four categories of traders: Producer/Merchant/Processor/User; Swap
+Dealers; Managed Money; and Other Reportables. The legacy COT report separates reportable
+traders only into “commercial” and “non-commercial” categories.
+All of the COT reports provide a breakdown of each Tuesday's open interest for markets in
+which 20 or more traders hold positions equal to or above the reporting levels established by the
+CFTC. 
+
+The Disaggregated Commitments of Traders Report
+The Commission, by regulation, collects confidential daily large-trader data as part of its market
+surveillance program. The data, which also support the legacy COT report, is separated into the
+following categories: 4
+1) “Producer/Merchant/Processor/User,”
+2) “Swap Dealers,”
+3) “Managed Money,” and
+4) “Other Reportables.”
+Trader Classification
+Staff use Form 40 data 5
+and, where appropriate, conversations with a trader and other data
+available to the Commission regarding a trader’s market activities to make a judgment on each
+trader’s appropriate classification.
+Some multi-service or multi-functional organizations have centralized their futures trading. In such
+cases, their Form 40 may show more than one of the new categories. Division of Market Oversight
+staff place each reportable trader in the most appropriate category based on their predominant
+activity. In most cases, the choice of category is clear, but in some cases judgment must be
+exercised by Commission staff as to what is a trader’s predominant activity. 6
+Some parent organizations set up separately reportable trading entities to handle their different
+businesses or locations. In such cases, each of these entities files a separate Form 40 and is
+analyzed separately for determining that entity’s proper Disaggregated COT classification.
+A trader’s classifications may change over a period of time for a number of reasons. A trader may
+change the different ways it uses the markets, may trade additional or fewer commodities, and may
+find that its client base evolves. These changes may lead to changes in classifications and
+categories and/or changes in the commodities to which a trader’s various classifications apply.
+Moreover, a trader’s classification may change because the Commission has received additional
+information about the trader.
+
+Content of the Disaggregated Commitments of Traders Report
+Producer/Merchant/Processor/User
+A “producer/merchant/processor/user” is an entity that predominantly engages in the production,
+processing, packing or handling of a physical commodity and uses the futures markets to manage or
+hedge risks associated with those activities.
+Swap Dealer A “swap dealer” is an entity that deals primarily in swaps for a commodity and uses the
+futures markets to manage or hedge the risk associated with those swaps transactions. The swap
+dealer’s counterparties may be speculative traders, like hedge funds, or traditional commercial clients
+that are managing risk arising from their dealings in the physical commodity.
+Money Manager A “money manager,” for the purpose of this report, is a registered commodity
+trading advisor (CTA); a registered commodity pool operator (CPO); or an unregistered fund
+identified by CFTC. 7
+These traders are engaged in managing and conducting organized futures
+trading on behalf of clients.
+Other Reportables
+Every other reportable trader that is not placed into one of the other three categories is placed into
+the “other reportables” category.
+Spreading
+The Disaggregated COT sets out open interest by long, short, and spreading for the three categories of
+traders—“swap dealers,” “managed money,” and “other reportable.” For the
+“producer/merchant/processor/user” category, open interest is reported only by long or short
+positions. “Spreading” is a computed amount equal to offsetting long and short positions held by a
+trader. The computed amount of spreading is calculated as the amount of offsetting futures in
+different calendar months or offsetting futures and options in the same or different calendar months.
+Any residual long or short position is reported in the long or short column. Inter-market spreads are
+not considered.
+Numbers of Traders
+The sum of the numbers of traders in each separate category typically exceeds the total number of
+reportable traders. This results from the fact that, in the “swap dealers,” “managed money,” and
+“other reportables” categories, “spreading” can be a partial activity, so the same trader can fall into
+either the outright “long” or “short” trader count, as well as into the “spreading” count.
+Additionally, a reportable “producer/merchant/processor/user” may be in both the long and the short
+position columns. In order to preserve the confidentiality of traders, for any given commodity
+where a specific category has fewer than four active traders, the size of the relevant positions will be
+provided but the trader count will be suppressed (specifically, a “·” will appear for trader counts of
+fewer than four traders)
+
+Potential Limitations of the Data
+Commission staff reviews the reasonableness of a trader’s classification for many of the largest
+traders in the markets based upon Form 40 disclosures and other information available to the
+Commission. As described above, the actual placement of a trader in a particular classification
+based upon their predominant business activity may involve some exercise of judgment on the part
+of Commission staff. Some traders being classified in the “swap dealers” category engage in some
+commercial activities in the physical commodity or have counterparties that do so. Likewise,
+some traders classified in the “producer/merchant/processor/user” category engage in some swaps
+activity. Moreover, it has always been true that the staff classifies traders not their trading activity.
+Staff will generally know, for example, that a trader is a “producer/merchant/processor/user” but we
+cannot know with certainty that all of that trader’s activity is hedging. Staff is working on
+improvements to the Form 40 and other methodologies in order to improve the accuracy of the
+trader classifications. When large reporting or classification issues are found, an announcement is
+made and corrections are published as quickly as possible.
+

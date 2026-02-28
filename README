@@ -1,0 +1,20 @@
+This is the Energy Analysis portion of the Macroeconomic Analysis project. 
+Although it was initially aptly named, holding only petroleum trade data, it
+is now a misnomer because this Energy Analysis has been expanded to include the
+Commodity Futures Trading Commission's Commitment of Traders Reports 
+(aggregated options and futures) on non-petroleum products as well. The folder
+names are self-descriptive enough to understand, and each follows the same 
+structure. For each cftc_cot_... folder, there is (1) an initialization file,
+(2) a historical webscraping file, (3) a new data collection file, and (4) a
+file to call data that has been collected (however, 4 is limited as it is
+currently set for petroleum products so the inputs need to be updated in the
+respective get_data_... .R files in each cftc_cot folder). It also includes 
+scripts to collect weekly Energy Information Association data (EIA) data
+on storage quantities and aggregated balance sheets. Also included is a mapping
+folder. This folder is just a rough geographic map of pipelines and refineries.
+
+It is recommended that once you download the historical files, that you either
+run the new_data file for each commodity group after each CFTC COT release and
+EIA release or that you write a script to schedule these events. If you don't
+the next run of the new data file will only collect the most recent date, 
+retaining that missed spot.
