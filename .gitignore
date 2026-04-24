@@ -1,4 +1,6 @@
 data/
+Current Futures Prices Analysis/
+Petroleum Supply/
 
 .DS_Store
 
@@ -7,7 +9,8 @@ data/
 *.xlsx
 
 /files/stocktrak*
-
 eia_api_key.R
-
 lseg_commodity_futures_historical.csv
+idk.R
+historical_futures_prices_2.R
+

@@ -69,12 +69,13 @@ library(stringr)
 library(ggnewscale)
 library(scales)
 library(data.table)
-source("Functions/nin.R")
+library(patchwork)
+setwd("/Users/josephjason/Documents/Forecasting/R/projects")
+source("Commodity Analysis/functions/nin.R")
 
 # LOAD DATA
-# setwd("/Users/josephjason/Documents/Forecasting/R/projects/Macroeconomic Analysis")
 # as of feb 7/8 2026
-csv <- read.csv("Energy Analysis/files/historical_futures_analysis/data/lseg_commodity_futures_historical.csv")
+csv <- read.csv("Commodity Analysis/files/historical_futures_analysis/data/commodity_continuous_series_lseg_apr_4_2026.csv")
 csv <- filter(
   csv,
   CalcSeriesName %nin% c("CMX-GOLD 100 OZ TRcm1",
@@ -147,7 +148,8 @@ csv_clean <- csv |>
          .by = commodity) |>
   mutate(contract_year = year(contract_date), 
          contract_month = month(contract_date),
-         .after = contract_date) |>
+         .after = contract_date,
+         year_group = ceiling(contract_year / 5) * 5) |>
   as.data.table()
 
 
@@ -164,76 +166,7 @@ csv_clean <- csv_clean[, {
 
 colSums(is.na(csv_clean))
 
-# Calculate settlement price change yoy
-futures <- csv_clean[, date_lag := date - years(1)]
-futures[futures, 
-        on = .(commodity, extracted_months_ahead, date_lag = date), 
-        roll = 2, 
-        settlement_lag := i.settlement]
-futures[, yoy := log(settlement) - log(settlement_lag)]
-
-setorder(futures, "commodity", "date", "month_num")
-
-# Plot YoY Change in Futures Curves
-
-grp <- "Lumber"
-filter_from <- as.Date("2004-01-01")
-filter_to <- as.Date("2026-02-03") # Max date
-
-ggplot() +
-  geom_path(
-    data = futures |> 
-      filter(commodity == grp,
-             date >= filter_from & date <= filter_to,
-             date %in% c(ceiling_date(date, "month") - days(1))
-      ),
-    aes(
-      x = contract_date,
-      y = yoy,
-      group = date,
-      colour = month_fct
-    ),
-    linewidth = 1
-  ) +
-  geom_hline(
-    yintercept = 0,
-    colour = "red",
-    linetype = "dashed",
-    linewidth = 0.25
-  ) +
-  facet_wrap(
-    ~ contract_year,
-    scales = "free_x"
-  ) +
-  labs(
-    title = paste0("Historical ", grp, " YoY (%) Change in Futures Prices Using Forward Curves at the Last Trading Day of Each Month."),
-    x = "",
-    y = "YoY Change (%)",
-    colour = "Observation\nDate"
-  ) +
-  scale_colour_viridis_d(option = "D") +
-  scale_x_date(
-    date_breaks = "3 months",
-    date_labels = "%b %Y"
-  ) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 90),
-    # axis.line.x.bottom = element_line(colour = "grey20", linewidth = 0.25),
-    panel.border = element_rect(colour = "grey20", 
-                                fill = NA, 
-                                linewidth = 0.25)
-    # panel.spacing.x = unit(-0.3, "lines")
-  )
-  
-
-
-
-# Plot and Save All Commodities
-pdf("Energy Analysis/files/historical_futures_analysis/data/historical_commodity_futures.pdf",
-    width = 11,
-    height = 8.5)
-
+# plot many
 for (i in seq_along(commodities)) {
   commodity_grp <- i
   plot <- ggplot(csv_clean |>
@@ -316,13 +249,16 @@ dev.off()
 
 # Plot Single Commodity
 # change for the plot
+contracts
+commodities
 commodity_grp <- "Lumber"
 
 ggplot(csv_clean |>
          group_by(date) |>
          filter(
            commodity == commodity_grp,
-           date >= as.Date("2010-01-01"),
+           date >= as.Date("2007-02-03"),
+           date <= as.Date("2020-02-03"),
            date %in% c(ceiling_date(date, "month") - days(1)
                        # ceiling_date(date, "month") - days(15)
                        )
@@ -358,27 +294,33 @@ ggplot(csv_clean |>
     size = 4,
     shape = 18
   ) +
-  geom_vline(
-    data = \(x) x |>
-      mutate(year_ln = floor_date(date, "year")) |>
-      group_by(year_ln) |>
-      slice_min(date, n = 1),
-    aes(xintercept = date),
-    linetype = "dashed",
-    alpha = 0.5,
-    colour = "gray20"
-  ) + 
+  # geom_vline(
+  #   data = \(x) x |>
+  #     mutate(year_ln = floor_date(date, "year")) |>
+  #     group_by(year_ln) |>
+  #     slice_min(date, n = 1),
+  #   aes(xintercept = date),
+  #   linetype = "dashed",
+  #   alpha = 0.5,
+  #   colour = "gray20"
+  # ) + 
   scale_colour_viridis_d(name = "Observation    \n     Year") +
   labs(
-    title = paste0(commodity_grp, " Historical Commodity Forward Curves (Bi-Monthly)."),
-    subtitle = "Vertical lines mark year transitions in the observation dates (the contracts are anchored to the front futures contract and not to the spot price, so the dashed \nlines are aligned to the first futures contract at that observation date).",
+    title = paste0(commodity_grp, " Historical Commodity Forward Curves."),
+    # subtitle = "Vertical lines mark year transitions in the observation dates (the contracts are anchored to the front futures contract and not to the spot price, so the dashed \nlines are aligned to the first futures contract at that observation date).",
+    subtitle = paste0("The ", commodity_grp, " forward curves are composed of ", 
+                      commodities[commodity == commodity_grp, total_contracts],
+                      " contracts, and the first contract of the forward curve is ",
+                      commodities[commodity == commodity_grp, nearest_contract],
+                      " month", ifelse(commodities[commodity == commodity_grp, nearest_contract] == 1, "", "s"), " ahead of the observation date."),
     x = "Contract Month",
-    y = "Settlement Price",
-    colour = "Month"
+    y = "Close Price",
+    colour = "Month",
+    caption = "Data from LSEG. Graph by Joseph Jason @github.com/7-jjason."
   ) +
   scale_x_date(
-    date_breaks = "3 months",
-    date_labels = "%b\n%Y"
+    date_breaks = "1 year",
+    date_labels = "%Y"
   ) +
   scale_y_continuous(breaks = scales::breaks_pretty(n = 8),
                      labels = scales::label_dollar(accuracy = 0.01)) +
@@ -394,9 +336,10 @@ ggplot(csv_clean |>
     axis.line.x.bottom = element_line(colour = "grey50",
                                       linewidth = 0.25),
     axis.line.y.left = element_line(colour = "grey50",
-                                    linewidth = 0.25)
+                                    linewidth = 0.25),
+    plot.caption = element_text(colour = "grey50",
+                                hjust = 0)
   )
-
 
 
 
@@ -416,14 +359,29 @@ commodities
 # all contracts
 contracts 
 # init
-commodity_grps <- c("Lumber", "Soybean Oil")
-filter_from <- as.Date("2015-01-01")
-filter_to <- Sys.Date()   # as.Date("2010-01-01")
+commodity_grps <- c("Soybeans", "Soybean Meal")
+filter_from <- as.Date("2010-01-01")
+filter_to <- as.Date("2020-06-01")
 conversion_factor <- 1    # Scale factor for the second commodity in 
                           #   commodity_grps, start at 1 and adjust.
                           # If not scaling correctly, switch order of
                           #   commodity_grps (higher price, lower price).
                           # 1 - viridis, 2 - magma.
+# or
+scaler <- csv_clean |>
+  filter(
+    commodity %in% commodity_grps,
+    date >= filter_from & date <= filter_to
+  ) |>
+  group_by(commodity) |>
+  reframe(
+    med_val = median(settlement, na.rm = TRUE)
+  )
+
+med_1 <- scaler[scaler$commodity == commodity_grps[[1]], "med_val"] |> pull()
+med_2 <- scaler[scaler$commodity == commodity_grps[[2]], "med_val"] |> pull()
+conversion_factor <- med_1/med_2
+
     
 # plot
 ggplot() +
@@ -438,11 +396,11 @@ ggplot() +
         names_from = commodity, values_from = settlement,
         id_cols = c(date, contract_date)
       ) |>
-      mutate(inter_commodity_basis = abs(.data[[commodity_grps[1]]] - .data[[commodity_grps[2]]]),
+      mutate(inter_commodity_basis = .data[[commodity_grps[1]]] - .data[[commodity_grps[2]]],
              Spread = "Spread") |>
       drop_na(inter_commodity_basis),
     aes(
-      x = contract_date, 
+      x = contract_date,
       y = inter_commodity_basis,
       colour = Spread
     ),
@@ -453,7 +411,7 @@ ggplot() +
   ) +
   scale_color_manual(
     values = c("Spread" = "blue"),
-    name = "Spread",  
+    name = "Spread - Loess",
     labels = c("Spread" = "")  # This is what shows for the line
   ) +
   new_scale_colour() +
@@ -466,31 +424,29 @@ ggplot() +
       ) |>
       pivot_wider(
         names_from = commodity, values_from = settlement,
-        id_cols = c(date, contract_date)
+        id_cols = c(date, contract_date, month_fct)
       ) |>
-      mutate(inter_commodity_basis = abs(.data[[commodity_grps[1]]] - .data[[commodity_grps[2]]]),
+      mutate(inter_commodity_basis = .data[[commodity_grps[1]]] - .data[[commodity_grps[2]]],
              Spread = "Spread") |>
       drop_na(inter_commodity_basis),
     aes(
-      x = contract_date, 
+      x = contract_date,
       y = inter_commodity_basis,
-      colour = Spread
+      colour = month_fct,
+      group = date
     ),
-    linewidth = 1,
-    alpha = 0.2
+    linewidth = 1
+    # alpha = 0.2
   ) +
-  scale_color_manual(
-    values = c("Spread" = "blue"),
-    name = "Spread",  
-    labels = c("Spread" = "")  # This is what shows for the line
-  ) +
+  scale_colour_viridis_d(name = paste0("Spread - Observation Month\n(", commodity_grps[[1]], " - ", commodity_grps[[2]], ")"),
+                         option = "rocket") +
   new_scale_colour() +
   geom_point(
     data = csv_clean |>
       filter(
         commodity == commodity_grps[1],
         date <= filter_to & date <= filter_to,
-        date %in% c(ceiling_date(date, "month") - days(1))
+        # date %in% c(ceiling_date(date, "month") - days(1))
       ) |>
       group_by(commodity, date) |>
       mutate(single_pt = n() == 1) |>
@@ -525,7 +481,7 @@ ggplot() +
     ),
     linewidth = 1
   ) +
-  scale_colour_viridis_d(name = paste0(commodity_grps[1], " - Month"),
+  scale_colour_viridis_d(name = paste0(commodity_grps[1], " - Observation Month"),
                          option = "viridis",
                          begin = 0.4) + 
   new_scale_colour() +
@@ -556,7 +512,6 @@ ggplot() +
         date >= filter_from & date <= filter_to,
         date %in% c(ceiling_date(date, "month") - days(1))
       ) |>
-      # group_by(date, contract_date) |>
       group_by(commodity, date) |>
       mutate(single_pt = n() == 1) |>
       ungroup() |>
@@ -570,8 +525,8 @@ ggplot() +
     ),
     linewidth = 1
   ) +
-  scale_colour_viridis_d(name = paste0(commodity_grps[2], " - Month"),
-                         option = "magma",
+  scale_colour_viridis_d(name = paste0(commodity_grps[2], " Observation - Month"),
+                         option = "cividis",
                          end = 0.85) + 
   new_scale_colour() +
   geom_vline(
@@ -597,42 +552,80 @@ ggplot() +
                    " and ", 
                    commodity_grps[2], 
                    " Historical Commodity Forward Curves, Monthly."),
-    subtitle = "Vertical dashed lines mark annual transitions (the first contract day is different for each commodity, so we default to January 1 here); \nlines denote a range of futures contracts per observation date; points (if any) denote a single contract per observation date.",
-    caption = "LSEG (formerly Refinitiv) Datastream Futures; WRDS.",
+    subtitle = paste0("The ", tolower(commodity_grps[1]), " forward curves are composed of ", 
+                      commodities[commodity == commodity_grps[1], total_contracts],
+                      " contracts, and the first contract of the forward curve is ",
+                      commodities[commodity == commodity_grps[1], nearest_contract],
+                      " month", ifelse(commodities[commodity == commodity_grp[1], nearest_contract] == 1, "", "s"), " ahead of the observation date.",
+                      "\nThe ", tolower(commodity_grps[2]), " forward curves are composed of ", 
+                      commodities[commodity == commodity_grps[2], total_contracts],
+                      " contracts, and the first contract of the forward curve is ",
+                      commodities[commodity == commodity_grps[2], nearest_contract],
+                      " month", ifelse(commodities[commodity == commodity_grp[2], nearest_contract] == 1, "", "s"), " ahead of the observation date."),
+    caption = "Data from LSEG; Graph by Joseph Jason @https://github.com/7-jjason.",
     x = "Futures Contract Month",
     y = "Contract Price"
   ) +
   scale_x_date(
-    date_breaks = "1 year",
+    date_breaks = "3 months",
     date_labels = "%b\n%Y",
     limits = c(filter_from, filter_to)
   ) +
   scale_y_continuous(name = paste0(commodity_grps[1], 
-                                   " Futures Price and Inter-Commodity Spread"),
+                                   " Futures Close Price and Inter-Commodity Spread"),
                      breaks = breaks_pretty(n = 8),
                      labels = label_dollar(accuracy = 0.01),
                      sec.axis = sec_axis(
                        transform = ~. / conversion_factor,
                        name = paste0(commodity_grps[2],
-                                     " Futures Price"),
+                                     " Futures Close Price"),
                        breaks = breaks_pretty(n = 8),
                        labels = label_dollar(accuracy = 0.01),
                      )) +
   theme_minimal() +
   theme(
-    axis.title.x = element_text(margin = margin(t = 10)),
-    axis.title.y.left = element_text(margin = margin(r = 10)),
-    axis.title.y.right = element_text(margin = margin(l = 10)),
-    plot.subtitle = element_text(margin = margin(b = 10)),
-    plot.caption = element_text(hjust = 0,
-                                colour = "grey50"),
-    legend.text = element_text(vjust = 1,
-                               hjust = 1,
-                               margin = margin(l = 10)),
+    axis.title.x = element_text(
+      margin = margin(t = 10),
+      # size = 16
+      ),
+    axis.title.y.left = element_text(
+      margin = margin(r = 10),
+      # size = 16
+      ),
+    axis.title.y.right = element_text(
+      margin = margin(l = 10),
+      # size = 16
+      ),
+    # axis.text.x = element_text(size = 14),
+    # axis.text.y = element_text(size = 14),
+    plot.subtitle = element_text(
+      margin = margin(b = 10),
+      # size = 16
+      ),
+    plot.caption = element_text(
+      hjust = 0,
+      colour = "grey50",
+      # size = 16
+      ),
+    plot.title = element_text(size = 18),
+    legend.text = element_text(
+      vjust = 1,
+      hjust = 1,
+      margin = margin(l = 10),
+      # size = 16
+      ),
+    # legend.title = element_text(size = 16),
     legend.key.width = unit(1.5, "cm"),
-    panel.border = element_rect(colour = "grey20", 
-                                fill = NA, 
-                                linewidth = 0.25)
+    panel.border = element_rect(
+      colour = "grey20", 
+      fill = NA, 
+      linewidth = 0.25)
   )
+ 
+
+
+
+
+
 
 
