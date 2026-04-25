@@ -2,7 +2,7 @@ source("Functions/extract_split.R")
 source("Functions/max_multi_join.R")
 
 # Get Data
-updated_data_ag <- readRDS("Energy Analysis/data/cftc_ag_dynamically_updated.rds")
+updated_data_ag <- readRDS("data/cftc_ag_dynamically_updated.rds")
 
 # Get Data by Commodity and Split
 wheat_srw <- extract_split(updated_data_ag, 
@@ -135,9 +135,9 @@ plot_data_milk <- multi_join(
   )
 
 plot_data_soybean <- multi_join(
-  soybeans |> mutate(Group = "Bean"),
-  soybean_meal |> mutate(Group = "Meal"),
-  soybean_oil |> mutate(Group = "Oil")
+  soybeans |> mutate(Group = "SoyBeans"),
+  soybean_meal |> mutate(Group = "Soybean Meal"),
+  soybean_oil |> mutate(Group = "Soybean Oil")
 ) |>
   filter(
     Statistic == "Changes in Commitments from Last Week (Contracts of Varying Amounts by Commodity)",
@@ -159,17 +159,16 @@ ggplot() +
     linewidth = 1
   ) + 
   labs(
-    # need to change the commodity each time - can fix it but first have to 
-    # include the commodity name in the df somehow
     title = paste0("Change in Commitments from Last Week, Published ", 
-                   format(max(plot_data$date, na.rm = TRUE), "%B %d, %Y"),
-                   ".\nHenry Hub; Natural Gas NYME"),
+                   format(max(plot_data$date, na.rm = TRUE), "%B %d, %Y")),
     x = "",
-    y = "x2500 MMBtus",
+    y = "Number of Contracts"
   ) +
   scale_x_date(breaks = plot_data$date,
                labels = as.character(plot_data$date)) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90)) + 
+  theme(axis.text.x = element_text(angle = 90),
+        plot.caption = element_text(colour = "grey40",
+                                    hjust = 0)) + 
   facet_wrap(~Variables, scales = "free_y", ncol = 3) 
 

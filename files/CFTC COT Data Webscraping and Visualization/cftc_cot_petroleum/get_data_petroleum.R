@@ -4,7 +4,7 @@ source("Functions/extract_split.R")
 source("Functions/max_multi_join.R")
 
 # Get Data
-updated_data_pet <- readRDS("Energy Analysis/data/cftc_petroleum_dynamically_updated.rds")
+updated_data_pet <- readRDS("data/cftc_petroleum_dynamically_updated.rds")
 
 # WTI
 wti <- extract_split(updated_data_pet,
@@ -71,7 +71,7 @@ ethanol <- extract_split(updated_data_pet,
                values_to = "Values")
 
 # NAT GAS
-updated_data_ng <- readRDS("Energy Analysis/data/cftc_nat_gas_dynamically_updated.rds")
+updated_data_ng <- readRDS("data/cftc_nat_gas_dynamically_updated.rds")
 nat_gas_ice_ld1 <- extract_split(updated_data_ng,
                                  "NAT GAS ICE LD1 - ICE FUTURES ENERGY DIV",
                                  "split 1") |>
@@ -117,17 +117,17 @@ ggplot() +
     linewidth = 1
   ) + 
   labs(
-    # need to change the commodity each time - can fix it but first have to 
-    # include the commodity name in the df somehow
     title = paste0("Change in Commitments from Last Week, Published ", 
                    max(plot_data_pet$date, na.rm = TRUE)),
     x = "",
-    y = "x100 Cubic Meters",
+    y = "Number of Contracts",
   ) +
   scale_x_date(date_breaks = "1 week",
                date_labels = "%Y-%b-%d") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90)) + 
+  theme(axis.text.x = element_text(angle = 90),
+        plot.caption = element_text(colour = "grey40",
+                                    hjust = 0)) + 
   facet_wrap(~Variables, 
              scales = "free_y", 
              ncol = 3,

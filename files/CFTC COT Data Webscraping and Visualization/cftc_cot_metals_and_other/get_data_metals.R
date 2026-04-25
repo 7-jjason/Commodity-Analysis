@@ -110,7 +110,7 @@ ggplot() +
                    format(max(plot_data$date, na.rm = TRUE), "%B %d, %Y"),
                    ".\nHenry Hub; Natural Gas NYME"),
     x = "",
-    y = "Contracts",
+    y = "Number of Contracts",
   ) +
   scale_x_yearmonth(breaks = plot_data$date,
                     labels = as.character(plot_data$date)) +
